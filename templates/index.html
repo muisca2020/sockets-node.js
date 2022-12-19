@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat con Node.JS, Sockets y Express</title>
+</head>
+<body>
+    <ul id="mensajes"></ul>
+    <form action="" id="form">
+        <input type="text" id="input" autocomplete="off">
+        <button>Enviar</button>
+    </form>
+
+    <!-- Se puede llamar un javascript instalado como módulo, como en este caso
+         para luego usarlo-->
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript">
+        // Aquí se está iniciando la conexión al socket
+        var socket = io();
+        // Ahora vamos a usar la información
+        let form = document.getElementById("form");
+        let input = document.getElementById("input");
+        let mensajes = document.getElementById("mensajes");
+
+        // Redefinimos una función de escucha para la forma
+        form.addEventListener('submit', function(e) {
+            // Definimos el cambio al comportamiento por defecto del formulario,
+            // para evitar que recarge la página
+            e.preventDefault();
+            // Entonces definimos que el socket emita con la leyenda chat message
+            // el contenido del campo input, limpiando el input a continuación
+            socket.emit('chat message', input.value);
+            input.value = '';
+        });
+
+        // Definimos el comportamiento cuando se recibe mediante el socket
+        // un mensaje de vuelta desde el server
+        socket.on('chat message', (msg) => {
+            // Creamos dinamicamente un nuevo list item de una lista
+            let item = document.createElement('li');
+            // Agregamos el contenido del mensaje como texto del li
+            item.textContent = msg;
+            // Adicionamos el li a listado no ordenado ul
+            mensajes.appendChild(item);
+            // Hacemos que la pagina baje hasta donde vaya el listado de 
+            // mensajes
+            window.scrollTo(0, document.body.scrollHeight);
+        });
+    </script>
+</body>
+</html>
