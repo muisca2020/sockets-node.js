@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat con Node.JS, Sockets y Express</title>
 </head>
-<body>
+<body id="body">
     <ul id="mensajes"></ul>
     <form action="" id="form">
         <input type="text" id="input" autocomplete="off">
@@ -23,6 +23,7 @@
         let form = document.getElementById("form");
         let input = document.getElementById("input");
         let mensajes = document.getElementById("mensajes");
+        let body = document.getElementById("body");
 
         // Redefinimos una función de escucha para la forma
         form.addEventListener('submit', function(e) {
@@ -34,6 +35,31 @@
             socket.emit('chat message', input.value);
             input.value = '';
         });
+
+        // Se configura un evento para el body de la página
+        body.addEventListener('onload', () => {
+            // Se valida si la página tiene permiso en el navegador para notificar
+            if(Notification.permission !== "granted") {
+                Notification.requestPermission();
+            }
+        });
+        
+        function mandarNotificaciones(msg) {
+            // Se valida si la página tiene permiso en el navegador para notificar
+            if(Notification.permission !== "granted") {
+                Notification.requestPermission();
+            } else {
+                const options = {
+                    body: msg,
+                    dir: 'ltr'
+                };
+                const notificacion = new Notification('Notification', options);
+                notificacion.onclick = () => {
+                    window.open("https://www.google.com/");
+                }
+            }
+            
+        }
 
         // Definimos el comportamiento cuando se recibe mediante el socket
         // un mensaje de vuelta desde el server
@@ -47,6 +73,7 @@
             // Hacemos que la pagina baje hasta donde vaya el listado de 
             // mensajes
             window.scrollTo(0, document.body.scrollHeight);
+            mandarNotificaciones(msg);
         });
     </script>
 </body>
